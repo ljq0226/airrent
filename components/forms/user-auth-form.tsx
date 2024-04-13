@@ -1,11 +1,13 @@
 "use client";
-import { registerLandlord } from "@/actions/login";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useMessage } from "@/hooks/useMessage";
 import { get, post } from "@/lib";
 import { Label } from "@radix-ui/react-label";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useRef, useState } from "react";
+import userStore from "@/store/user";
+import { useToast } from "../ui/use-toast";
 
 export default function UserAuthForm() {
   const searchParams = useSearchParams();
@@ -13,9 +15,11 @@ export default function UserAuthForm() {
   const [password, setPassword] = useState("");
   const [isRegister, setIsRegister] = useState(false);
   const router = useRouter();
+  const [setUser] = userStore((s) => [s.setUser]);
+  const { message } = useMessage();
   const submit = async () => {
     try {
-      const { code, msg } = isRegister
+      const { code, msg, data } = isRegister
         ? await post("landlord/register", {
             username,
             password,
@@ -25,12 +29,13 @@ export default function UserAuthForm() {
             password,
           });
       if (code == 200) {
+        setUser(data);
         router.push("/cms");
-      } else {
-        console.log(msg);
+        message({ title: "登录成功!" });
       }
-    } catch (err) {
-      console.log("err", err);
+    } catch (error: any) {
+      console.log("error", error);
+      message({ title: error.toString() });
     }
   };
   return (
@@ -57,7 +62,7 @@ export default function UserAuthForm() {
             <Label htmlFor="pasword">密码</Label>
             <Input
               value={password}
-              type="pasword"
+              type="password"
               id="pasword"
               placeholder="请输入密码"
               onChange={(e) => setPassword(e.target.value)}

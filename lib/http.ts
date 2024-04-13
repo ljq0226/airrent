@@ -1,3 +1,4 @@
+
 interface Options {
   headers?: { [key: string]: string }
   body?: any
@@ -46,8 +47,11 @@ async function post<T>(url: string, data: any, options: Options = {}): Promise<R
     body: JSON.stringify(data),
   })
 
-  if (!response.ok)
-    throw new Error(response.statusText)
+  if (!response.ok){
+    const text = await response.text()
+    const {msg} = JSON.parse(text)
+    throw new Error(response.statusText+' '+msg)
+  }
 
   const contentType = response.headers.get('content-type')
   if (contentType && contentType.includes('application/json')) {

@@ -50,8 +50,7 @@ export default function AuthenticationPage() {
         </div>
       </div>
       <div className="flex items-center h-full p-4 lg:p-8">
-       
-          <UserAuthForm />
+        <UserAuthForm />
       </div>
     </div>
   );

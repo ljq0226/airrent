@@ -1,3 +1,4 @@
+"use client";
 import { CalendarDateRangePicker } from "@/components/date-range-picker";
 import { Overview } from "@/components/overview";
 import { RecentSales } from "@/components/recent-sales";
@@ -11,8 +12,11 @@ import {
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import userStore from "@/store/user";
 
 export default function page() {
+  const user = userStore((s) => s.user);
+  console.log("user", user);
   return (
     <ScrollArea className="h-full">
       <div className="flex-1 p-4 pt-6 space-y-4 md:p-8">
