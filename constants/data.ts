@@ -1,5 +1,23 @@
 import { Icons } from "@/components/icons";
 import { NavItem, SidebarNavItem } from "@/types";
+import { Value } from "@radix-ui/react-select";
+
+export const PriceTypeOptions = [
+  { value: "DAILY", label: "日租" },
+  { value: "WEEKLY", label: "周租" },
+  { value: "MONTHLY", label: "月租" },
+  { value: "YEARLY", label: "年租" },
+];
+export const RentTypeOptions = [
+  { value: 0, label: "整租" },
+  { value: 1, label: "合租" },
+];
+export const HouseDirection = [
+  {Value:'朝东',label:'朝东'},
+  {Value:'朝南',label:'朝南'},
+  {Value:'朝西',label:'朝西'},
+  {Value:'朝北',label:'朝北'},
+]
 
 export type User = {
   id: number;
@@ -117,6 +135,13 @@ export const navItems: NavItem[] = [
     href: "/cms",
     icon: "dashboard",
     label: "cms",
+    role:'LANDLORD'
+  },
+  {
+    title:'房源管理',
+    href:"/cms/listing",
+    icon:'hotel',
+    label:'listing'
   },
   {
     title: "User",

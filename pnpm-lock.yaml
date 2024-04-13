@@ -138,7 +138,7 @@ dependencies:
     specifier: 2.0.0-alpha.4
     version: 2.0.0-alpha.4(date-fns@2.30.0)(react@18.2.0)
   react-day-picker:
-    specifier: ^8.9.1
+    specifier: ^8.10.0
     version: 8.10.0(date-fns@2.30.0)(react@18.2.0)
   react-dom:
     specifier: ^18.2.0
@@ -173,6 +173,9 @@ dependencies:
   uuid:
     specifier: ^9.0.1
     version: 9.0.1
+  vaul:
+    specifier: ^0.9.0
+    version: 0.9.0(@types/react-dom@18.2.7)(@types/react@18.2.21)(react-dom@18.2.0)(react@18.2.0)
   zod:
     specifier: ^3.22.4
     version: 3.22.4
@@ -5146,6 +5149,20 @@ packages:
   /uuid@9.0.1:
     resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
     hasBin: true
+    dev: false
+
+  /vaul@0.9.0(@types/react-dom@18.2.7)(@types/react@18.2.21)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-bZSySGbAHiTXmZychprnX/dE0EsSige88xtyyL3/MCRbrFotRPQZo7UdydGXZWw+CKbNOw5Ow8gwAo93/nB/Cg==}
+    peerDependencies:
+      react: ^16.8 || ^17.0 || ^18.0
+      react-dom: ^16.8 || ^17.0 || ^18.0
+    dependencies:
+      '@radix-ui/react-dialog': 1.0.5(@types/react-dom@18.2.7)(@types/react@18.2.21)(react-dom@18.2.0)(react@18.2.0)
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    transitivePeerDependencies:
+      - '@types/react'
+      - '@types/react-dom'
     dev: false
 
   /victory-vendor@36.9.2:
