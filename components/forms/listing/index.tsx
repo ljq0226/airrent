@@ -28,7 +28,11 @@ import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { formSchema } from "./data";
 import { DateRange } from "react-day-picker";
-import { PriceTypeOptions, RentTypeOptions } from "@/constants/data";
+import {
+  HouseDirection,
+  PriceTypeOptions,
+  RentTypeOptions,
+} from "@/constants/data";
 import FileUpload from "@/components/file-upload";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -38,21 +42,25 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
+import { post } from "@/lib";
+import { useMessage } from "@/hooks/useMessage";
 type AddListingFormValues = z.infer<typeof formSchema>;
 
 interface AddListingFormProps {
   initialData: any | null;
 }
-
+type ProductFormValues = z.infer<typeof formSchema>;
 export const AddListingForm: React.FC<AddListingFormProps> = ({
   initialData,
 }) => {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
   const [imgLoading, setImgLoading] = useState(false);
   const title = initialData ? "编辑房源" : "新增房源";
   const description = "";
+  const { message } = useMessage();
   const toastMessage = initialData ? "Product updated." : "Product created.";
   const action = initialData ? "更新房源" : "新建房源";
   const [date, setDate] = useState<DateRange | undefined>({
@@ -64,15 +72,68 @@ export const AddListingForm: React.FC<AddListingFormProps> = ({
     : {
         title: "",
         description: "",
+        address: "",
+        advantage: "",
+        area: 0,
         price: 0,
+        bathroomCount: 0,
+        buildYear: 2010,
+        city: "",
+        direction: "",
+        floor: 1,
         images: [],
         rentType: 0,
+        keywords: "",
+        livingroomCount: 0,
+        roomCount: 1,
+        totalFloor: 1,
+        about: "",
+        listingIntro: "",
+        tenantPermission: "",
+        others: "",
+        bedroomFacilities: "",
+        nearbyInfo: "",
       };
 
   const form = useForm<AddListingFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues,
   });
+  const onSubmit = async () => {
+    const formValue = form.getValues();
+    const images = formValue.images.join("");
+    const cover = images.split(",")[0];
+    const code = "";
+    delete formValue.rentTime;
+    const [availableFrom, availableUntil] = [date?.from, date?.to];
+    const postdata = {
+      ...formValue,
+      images,
+      cover,
+      code,
+      availableFrom,
+      availableUntil,
+      landlordId: "17d20f4c-c354-49e4-9954-c1600049f7f8",
+    };
+    try {
+      setLoading(true);
+      if (initialData) {
+        // await axios.post(`/api/products/edit-product/${initialData._id}`, data);
+      } else {
+        const { code, data, msg } = await post(`listing/add_listing`, postdata);
+        if (code == 200) {
+          message({ title: "新增房源成功,请等待管理员审核" });
+          router.replace("/cms/listing");
+        } else {
+          message({ title: msg });
+        }
+      }
+    } catch (error: any) {
+      message({ title: error.toString() });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -91,10 +152,7 @@ export const AddListingForm: React.FC<AddListingFormProps> = ({
       </div>
       <Separator />
       <Form {...form}>
-        <form
-          // onSubmit={form.handleSubmit(onSubmit)}
-          className="w-full space-y-3 pr-[15%] pb-[200px]"
-        >
+        <form className="w-full space-y-3 pr-[15%] pb-[200px]">
           <h2>基本信息</h2>
           <FormField
             control={form.control}
@@ -173,6 +231,23 @@ export const AddListingForm: React.FC<AddListingFormProps> = ({
                     <Textarea
                       disabled={loading}
                       placeholder="房源描述"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="nearbyInfo"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>附近描述</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      disabled={loading}
+                      placeholder="房源附近描述"
                       {...field}
                     />
                   </FormControl>
@@ -389,7 +464,7 @@ export const AddListingForm: React.FC<AddListingFormProps> = ({
                     <Input
                       type="number"
                       min={0}
-                      step="0.1"
+                      step={1}
                       disabled={loading}
                       {...field}
                     />
@@ -448,7 +523,8 @@ export const AddListingForm: React.FC<AddListingFormProps> = ({
                     <Input
                       type="number"
                       step="1"
-                      min={1990}
+                      min={2000}
+                      max={2030}
                       disabled={loading}
                       {...field}
                     />
@@ -463,13 +539,23 @@ export const AddListingForm: React.FC<AddListingFormProps> = ({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>朝向</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={loading}
-                      placeholder="房源朝向"
-                      {...field}
-                    />
-                  </FormControl>
+                  <Select disabled={loading} onValueChange={field.onChange}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          defaultValue={field.value}
+                          placeholder="房源朝向"
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {HouseDirection.map((item) => (
+                        <SelectItem key={item.label} value={item.value}>
+                          {item.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
@@ -512,11 +598,81 @@ export const AddListingForm: React.FC<AddListingFormProps> = ({
               )}
             />
           </div>
-
-          <Button disabled={loading} className="ml-auto" type="submit">
-            {action}
-          </Button>
+          <h1 className="mt-0">关于此房源</h1>
+          <div className="gap-8 md:grid md:grid-cols-4">
+            <FormField
+              control={form.control}
+              name="about"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>介绍</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      disabled={loading}
+                      placeholder="房源优势"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="listingIntro"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>房源介绍</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      disabled={loading}
+                      placeholder="房源介绍"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="tenantPermission"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>房客使用权限</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      disabled={loading}
+                      placeholder="房客使用权限"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="others"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>其他注意事项</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      disabled={loading}
+                      placeholder="其他注意事项"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         </form>
+        <Button disabled={loading} className="ml-auto" onClick={onSubmit}>
+          {action}
+        </Button>
       </Form>
     </>
   );
