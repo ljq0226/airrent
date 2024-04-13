@@ -30,21 +30,21 @@ export default function FileUpload({
   };
   return (
     <div>
-      <div className="mb-4 flex items-center gap-4">
-        {!!value.length &&
+      <div className="flex items-center gap-4 mb-4">
+        {!!value?.length &&
           value?.map((item) => (
             <div
               key={item.key}
               className="relative w-[200px] h-[200px] rounded-md overflow-hidden"
             >
-              <div className="z-10 absolute top-2 right-2">
+              <div className="absolute z-10 top-2 right-2">
                 <Button
                   type="button"
                   onClick={() => onDeleteFile(item.key)}
                   variant="destructive"
                   size="sm"
                 >
-                  <Trash className="h-4 w-4" />
+                  <Trash className="w-4 h-4" />
                 </Button>
               </div>
               <div>
@@ -61,7 +61,7 @@ export default function FileUpload({
       <div>
         {value.length < IMG_MAX_LIMIT && (
           <UploadDropzone<OurFileRouter>
-            className="dark:bg-zinc-800 py-2 ut-label:text-sm ut-allowed-content:ut-uploading:text-red-300"
+            className="py-2 dark:bg-zinc-800 ut-label:text-sm ut-allowed-content:ut-uploading:text-red-300"
             endpoint="imageUploader"
             config={{ mode: "auto" }}
             content={{

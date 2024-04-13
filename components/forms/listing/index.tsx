@@ -21,7 +21,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CalendarIcon, Trash } from "lucide-react";
+import { CalendarIcon, Save, Plus } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import * as z from "zod";
@@ -53,7 +53,6 @@ type ProductFormValues = z.infer<typeof formSchema>;
 export const AddListingForm: React.FC<AddListingFormProps> = ({
   initialData,
 }) => {
-  const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -101,7 +100,9 @@ export const AddListingForm: React.FC<AddListingFormProps> = ({
   });
   const onSubmit = async () => {
     const formValue = form.getValues();
-    const images = formValue.images.join("");
+    console.log("formValue", formValue);
+    // const images =  formValue.images.join("");
+    const images = "";
     const cover = images.split(",")[0];
     const code = "";
     delete formValue.rentTime;
@@ -118,7 +119,16 @@ export const AddListingForm: React.FC<AddListingFormProps> = ({
     try {
       setLoading(true);
       if (initialData) {
-        // await axios.post(`/api/products/edit-product/${initialData._id}`, data);
+        const { code, data, msg } = await post(
+          `listing/update_listing`,
+          postdata,
+        );
+        if (code == 200) {
+          message({ title: "更新房源信息成功,请等待管理员审核" });
+          router.replace("/cms/listing");
+        } else {
+          message({ title: msg });
+        }
       } else {
         const { code, data, msg } = await post(`listing/add_listing`, postdata);
         if (code == 200) {
@@ -139,20 +149,29 @@ export const AddListingForm: React.FC<AddListingFormProps> = ({
     <>
       <div className="flex items-center justify-between">
         <Heading title={title} description={description} />
-        {initialData && (
-          <Button
-            disabled={loading}
-            variant="destructive"
-            size="sm"
-            onClick={() => setOpen(true)}
-          >
-            <Trash className="w-4 h-4" />
-          </Button>
-        )}
+        <Button
+          disabled={loading}
+          variant="default"
+          size="lg"
+          className="fixed right-10 top-20"
+          onClick={onSubmit}
+        >
+          {initialData ? (
+            <>
+              <Save className="w-4 h-4" />
+              <div className="ml-2">保存编辑</div>
+            </>
+          ) : (
+            <>
+              <Plus className="w-4 h-4" />
+              <div className="ml-2">新增房源</div>
+            </>
+          )}
+        </Button>
       </div>
       <Separator />
       <Form {...form}>
-        <form className="w-full space-y-3 pr-[15%] pb-[200px]">
+        <form className="w-full space-y-3 pr-[15%]">
           <h2>基本信息</h2>
           <FormField
             control={form.control}
@@ -670,10 +689,8 @@ export const AddListingForm: React.FC<AddListingFormProps> = ({
             />
           </div>
         </form>
-        <Button disabled={loading} className="ml-auto" onClick={onSubmit}>
-          {action}
-        </Button>
       </Form>
+      <div className="mt-[350px] h-[100px] w-full"></div>
     </>
   );
 };

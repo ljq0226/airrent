@@ -4,6 +4,9 @@ import "@uploadthing/react/styles.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { Theme } from '@radix-ui/themes';
+
+import '@radix-ui/themes/styles.css';
 import { getServerSession } from "next-auth";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -23,8 +26,10 @@ export default async function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className}`}>
         <Providers session={session}>
+        <Theme>
           <Toaster />
           {children}
+        </Theme>
         </Providers>
       </body>
     </html>

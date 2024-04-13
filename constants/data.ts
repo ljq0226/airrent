@@ -5,8 +5,18 @@ export const PriceTypeOptions = [
   { value: "DAILY", label: "日租" },
   { value: "WEEKLY", label: "周租" },
   { value: "MONTHLY", label: "月租" },
+  { value: "QUARTERLY", label: "季租" },
   { value: "YEARLY", label: "年租" },
 ];
+type PriceType = 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'QUARTERLY' | 'YEARLY';
+
+export const PriceTypeMap: Record<PriceType, string> = {
+  'DAILY': "日租",
+  'WEEKLY': "周租",
+  'MONTHLY': "月租",
+  'QUARTERLY': "季租",
+  'YEARLY': "年租",
+}
 export const RentTypeOptions = [
   { value: 0, label: "整租" },
   { value: 1, label: "合租" },

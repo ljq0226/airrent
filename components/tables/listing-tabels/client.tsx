@@ -17,42 +17,55 @@ import { User } from "@/constants/data";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { columns } from "./columns";
+import { useEffect, useMemo, useState } from "react";
+import { useMessage } from "@/hooks/useMessage";
+import { get } from "@/lib";
+import TableStore from "@/store/table";
 
 export const ListingClient = () => {
   const router = useRouter();
-  const data = [];
+  const [tableData, setTableData] = useState<any>([]);
+  const { message } = useMessage();
+  const [listingTableRefresh, setListingTableRefresh, setUpdateListingData] =
+    TableStore((s) => [
+      s.listingTableRefresh,
+      s.setListingTableRefresh,
+      s.setUpdateListingData,
+    ]);
+  const getAllData = async () => {
+    try {
+      const { code, data, msg }: { code: number; data: any; msg: string } =
+        await get("listing/getall_listing");
+      if (code === 200) {
+        const arr = data.arr as any[];
+        setTableData(arr);
+      } else {
+        message({ title: msg });
+      }
+    } catch (err: any) {
+      message({ title: err.toString() });
+    }
+  };
+  useEffect(() => {
+    getAllData();
+    setUpdateListingData(null);
+  }, [listingTableRefresh]);
   return (
     <>
       <div className="flex items-start justify-between">
         <Heading
-          title={`我的房源 (${data.length})`}
+          title={`我的房源 (${tableData.length})`}
           description="已发布和未审核"
         />
         <Button
           className="text-xs md:text-sm"
-          onClick={() => router.push(`/cms/listing/add`)}
+          onClick={() => router.push(`/cms/listing/edit`)}
         >
           <Plus className="w-4 h-4 mr-2" /> 新增房源
         </Button>
       </div>
-      <Drawer>
-        <DrawerTrigger>Open</DrawerTrigger>
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle>Are you absolutely sure?</DrawerTitle>
-            <DrawerDescription>This action cannot be undone.</DrawerDescription>
-          </DrawerHeader>
-          <DrawerFooter>
-            <Button>Submit</Button>
-            <DrawerClose>
-              <Button variant="outline">Cancel</Button>
-            </DrawerClose>
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
-
       <Separator />
-      <DataTable searchKey="name" columns={columns} data={data} />
+      <DataTable searchKey="title" columns={columns} data={tableData} />
     </>
   );
 };
